@@ -1,0 +1,10 @@
+Ruby 1.9.2 does not accept mm/dd/yyyy input, preferring to either silently read it as dd/mm or raise an exception if the date is greater than 12. This piece of code should be inserted into an ActiveRecord model with a date column in :datetime format.  It dentifies mm/dd/yyyy and its variants and converts them into yyyy/mm/dd, then defers to ActiveRecord's original implementation of the setter to save to the table.
+
+def date=(_date)
+  date = _date
+  match = /(\d{1,2})\/(\d{1,2})\/(\d{2,4})/.match(_date) #looking for dates like 10/12/2012, 1/3/2012, 3/13/12, etc. but not 2012/10/12.
+  if match
+    date = match[3] + "/" + match[1] + "/" + match[2]
+  end
+  super(date)
+end
